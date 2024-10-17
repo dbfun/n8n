@@ -1,0 +1,62 @@
+#
+# docker-compose.yml: https://github.com/n8n-io/n8n-hosting/tree/main/docker-compose/withPostgres
+# конфиги: https://docs.n8n.io/hosting/configuration/environment-variables/
+#
+
+services:
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./docker/postgres/Dockerfile
+    hostname: postgres
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+      - POSTGRES_NON_ROOT_USER
+      - POSTGRES_NON_ROOT_PASSWORD
+    volumes:
+      - ${DATA_PATH}/postgresql:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  startup:
+    build:
+      context: .
+      dockerfile: ./docker/startup/Dockerfile
+    # смена владельца каталога, так как n8n запускается от непривилегированного пользователя
+    command: chown -R startup:startup /home/node/.n8n
+    volumes:
+      - ${DATA_PATH}/n8n:/home/node/.n8n
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    restart: always
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
+      - DB_POSTGRESDB_USER=${POSTGRES_NON_ROOT_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
+      - N8N_PORT=80
+      - N8N_EDITOR_BASE_URL
+      - GENERIC_TIMEZONE=Europe/Moscow
+      - N8N_HIDE_USAGE_PAGE=true
+    hostname: n8n
+    ports:
+      - ${HTTP_PORT}:80
+    links:
+      - postgres
+    volumes:
+      - ${DATA_PATH}/n8n:/home/node/.n8n
+      # для сохранения файлов в локальный каталог (для отладки)
+      - ./files:/home/node/files
+    depends_on:
+      postgres:
+        condition: service_healthy
