@@ -1,0 +1,55 @@
+variables:
+  DEPLOY_DIR: /home/gitlab-runner/deploy-from-dc/${APP_DOMAIN}
+  DEPLOY_FILE: docker-compose.deploy.yml
+  DEPLOY_FILE_ABS: ${DEPLOY_DIR}/docker-compose.yml
+  CADDY_CONFIG: /etc/caddy/sites-enabled/$APP_DOMAIN
+
+stages:
+  - build
+  - deploy
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+
+.base_build:
+  variables:
+    TAG_SHA: n8n_${APP_PART}:${CI_COMMIT_SHA}
+    TAG_LATEST: n8n_${APP_PART}:latest
+  script:
+    - docker build . -f ./docker/${APP_PART}/Dockerfile -t ${TAG_SHA} -t ${TAG_LATEST}
+  tags:
+    - docker-image-builder
+
+build startup:
+  stage: build
+  extends: .base_build
+  variables:
+    APP_PART: startup
+
+build postgres:
+  stage: build
+  extends: .base_build
+  variables:
+    APP_PART: postgres
+
+run services:
+  stage: deploy
+  tags:
+    - deploy
+  script:
+    - mkdir -p ${DEPLOY_DIR}
+    - cp ${DEPLOY_FILE} ${DEPLOY_FILE_ABS}
+    - docker compose -f ${DEPLOY_FILE_ABS} up -d
+    - echo -e "$APP_DOMAIN {\n  reverse_proxy :$HTTP_PORT\n}" | sudo tee $CADDY_CONFIG
+    - sudo service caddy reload
+
+stop services:
+  stage: deploy
+  when: manual
+  tags:
+    - deploy
+  script:
+    - docker-compose -f ${DEPLOY_FILE_ABS} down
+    - sudo rm $CADDY_CONFIG
+    - sudo service caddy reload

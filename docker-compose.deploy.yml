@@ -34,18 +34,14 @@ services:
         condition: service_healthy
 
   startup:
-    build:
-      context: .
-      dockerfile: ./docker/startup/Dockerfile
+    image: n8n_startup:${CI_COMMIT_SHA}
     # смена владельца каталога, так как n8n запускается от непривилегированного пользователя
-    command: chown startup:startup /home/node/.n8n
+    command: chown -R startup:startup /home/node/.n8n
     volumes:
       - ${DATA_PATH}/n8n:/home/node/.n8n
 
   postgres:
-    build:
-      context: .
-      dockerfile: ./docker/postgres/Dockerfile
+    image: n8n_postgres:${CI_COMMIT_SHA}
     hostname: postgres
     environment:
       - POSTGRES_USER
