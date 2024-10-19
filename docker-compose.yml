@@ -19,6 +19,7 @@ services:
       - N8N_EDITOR_BASE_URL
       - GENERIC_TIMEZONE=Europe/Moscow
       - N8N_HIDE_USAGE_PAGE=true
+      - N8N_METRICS=true
     hostname: n8n
     ports:
       - ${HTTP_PORT}:80
