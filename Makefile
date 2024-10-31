@@ -2,7 +2,7 @@
 # Application workflow
 #################################
 
-SERVICES=postgres n8n startup
+SERVICES=postgres n8n startup qdrant
 
 # Run all containers
 .PHONY: up

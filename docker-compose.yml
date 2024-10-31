@@ -1,5 +1,7 @@
 #
-# docker-compose.yml: https://github.com/n8n-io/n8n-hosting/tree/main/docker-compose/withPostgres
+# docker-compose.yml:
+# * https://github.com/n8n-io/n8n-hosting/tree/main/docker-compose/withPostgres
+# * https://github.com/n8n-io/self-hosted-ai-starter-kit/blob/main/docker-compose.yml
 # конфиги: https://docs.n8n.io/hosting/configuration/environment-variables/
 #
 
@@ -33,6 +35,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  qdrant:
+    image: qdrant/qdrant
+    hostname: qdrant
+    restart: unless-stopped
+    ports:
+      - ${QDRANT_PORT}:6333
+    volumes:
+      - ${DATA_PATH}/qdrant:/qdrant/storage
 
   startup:
     build:
