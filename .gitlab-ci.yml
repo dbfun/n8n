@@ -41,7 +41,7 @@ run services:
     - mkdir -p ${DEPLOY_DIR}
     - cp ${DEPLOY_FILE} ${DEPLOY_FILE_ABS}
     - docker compose -f ${DEPLOY_FILE_ABS} up -d
-    - echo -e "$APP_DOMAIN {\n  reverse_proxy :$HTTP_PORT\n}" | sudo tee $CADDY_CONFIG
+    - set -x; envsubst < caddy.conf | sudo tee $CADDY_CONFIG
     - sudo service caddy reload
 
 stop services:
