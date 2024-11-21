@@ -50,6 +50,6 @@ stop services:
   tags:
     - deploy
   script:
-    - docker-compose -f ${DEPLOY_FILE_ABS} down
+    - docker compose -f ${DEPLOY_FILE_ABS} down
     - sudo rm $CADDY_CONFIG
     - sudo service caddy reload
