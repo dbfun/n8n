@@ -32,6 +32,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  qdrant:
+    image: qdrant/qdrant
+    hostname: qdrant
+    restart: unless-stopped
+    ports:
+      - ${QDRANT_PORT}:6333
+    volumes:
+      - ${DATA_PATH}/qdrant:/qdrant/storage
 
   startup:
     image: n8n_startup:${CI_COMMIT_SHA}
