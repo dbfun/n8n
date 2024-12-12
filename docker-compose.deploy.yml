@@ -35,6 +35,23 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_storage:/root/.ollama
+
+  init-ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-pull-llama
+    volumes:
+      - ollama_storage:/root/.ollama
+    entrypoint: /bin/sh
+    command:
+      - "-c"
+      - "sleep 3; export OLLAMA_HOST=ollama:11434; ollama pull mxbai-embed-large; ollama pull llama3.1:8b"
+
   qdrant:
     image: qdrant/qdrant
     hostname: qdrant
@@ -70,3 +87,6 @@ services:
       retries: 10
     ports:
       - ${PG_PORT}:5432
+
+volumes:
+  ollama_storage:
