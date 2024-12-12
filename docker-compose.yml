@@ -28,6 +28,7 @@ services:
     links:
       - postgres
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ${DATA_PATH}/n8n:/home/node/.n8n
       # для сохранения файлов в локальный каталог (для отладки)
       - ./files:/home/node/files
@@ -65,6 +66,13 @@ services:
       - ${QDRANT_PORT}:6333
     volumes:
       - ${DATA_PATH}/qdrant:/qdrant/storage
+
+  playwright-chromium:
+    image: playwright/chromium
+    hostname: playwright-chromium
+    restart: unless-stopped
+    volumes:
+      - ./src/playwright:/home/pwuser/src
 
   startup:
     build:
