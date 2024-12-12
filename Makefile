@@ -2,7 +2,7 @@
 # Application workflow
 #################################
 
-SERVICES=postgres n8n startup qdrant
+SERVICES=postgres n8n startup qdrant ollama
 
 # Run all containers
 .PHONY: up
@@ -30,3 +30,11 @@ list-workflow:
 .PHONY: export-workflow
 export-workflow:
 	@docker compose exec n8n n8n export:workflow --all
+
+#################################
+# playwright
+#################################
+
+.PHONY: playwright-chromium
+playwright-chromium:
+	@docker compose exec playwright-chromium bash
