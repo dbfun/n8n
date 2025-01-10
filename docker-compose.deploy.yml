@@ -1,5 +1,7 @@
 #
-# docker-compose.yml: https://github.com/n8n-io/n8n-hosting/tree/main/docker-compose/withPostgres
+# docker-compose.yml:
+# * https://github.com/n8n-io/n8n-hosting/tree/main/docker-compose/withPostgres
+# * https://github.com/n8n-io/self-hosted-ai-starter-kit/blob/main/docker-compose.yml
 # конфиги: https://docs.n8n.io/hosting/configuration/environment-variables/
 #
 
@@ -19,6 +21,7 @@ services:
       - N8N_EDITOR_BASE_URL
       - GENERIC_TIMEZONE=Europe/Moscow
       - N8N_HIDE_USAGE_PAGE=true
+      - N8N_METRICS=true
     hostname: n8n
     ports:
       - ${HTTP_PORT}:80
