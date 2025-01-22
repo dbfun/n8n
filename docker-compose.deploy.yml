@@ -91,5 +91,12 @@ services:
     ports:
       - ${PG_PORT}:5432
 
+  redis:
+    image: redis:alpine
+    hostname: redis
+    restart: always
+    volumes:
+      - ${DATA_PATH}/redis:/data
+
 volumes:
   ollama_storage:

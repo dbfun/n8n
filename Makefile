@@ -2,7 +2,7 @@
 # Application workflow
 #################################
 
-SERVICES=postgres n8n startup qdrant ollama init-ollama
+SERVICES=postgres n8n startup qdrant ollama init-ollama redis
 
 # Run all containers
 .PHONY: up
