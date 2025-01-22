@@ -22,6 +22,11 @@ services:
       - GENERIC_TIMEZONE=Europe/Moscow
       - N8N_HIDE_USAGE_PAGE=true
       - N8N_METRICS=true
+#      - N8N_LOG_LEVEL=debug
+#      - N8N_LOG_LEVEL=info
+#      - N8N_LOG_LEVEL=warn
+#      - N8N_LOG_LEVEL=error
+#      - N8N_LOG_LEVEL=silent
     hostname: n8n
     ports:
       - ${HTTP_PORT}:80
