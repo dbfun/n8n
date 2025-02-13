@@ -2,7 +2,6 @@ variables:
   DEPLOY_DIR: /home/gitlab-runner/deploy-from-dc/${APP_DOMAIN}
   DEPLOY_FILE: docker-compose.deploy.yml
   DEPLOY_FILE_ABS: ${DEPLOY_DIR}/docker-compose.yml
-  CADDY_CONFIG: /etc/caddy/sites-enabled/$APP_DOMAIN
 
 stages:
   - build
@@ -41,8 +40,6 @@ run services:
     - mkdir -p ${DEPLOY_DIR}
     - cp ${DEPLOY_FILE} ${DEPLOY_FILE_ABS}
     - docker compose -f ${DEPLOY_FILE_ABS} up -d
-    - set -x; envsubst < caddy.conf | sudo tee $CADDY_CONFIG
-    - sudo service caddy reload
 
 stop services:
   stage: deploy
@@ -51,5 +48,3 @@ stop services:
     - deploy
   script:
     - docker compose -f ${DEPLOY_FILE_ABS} down
-    - sudo rm $CADDY_CONFIG
-    - sudo service caddy reload

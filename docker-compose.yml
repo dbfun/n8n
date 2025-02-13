@@ -22,14 +22,16 @@ services:
       - GENERIC_TIMEZONE=Europe/Moscow
       - N8N_HIDE_USAGE_PAGE=true
       - N8N_METRICS=true
+      # Только для локальной разработки для обхода проблемы:
+      # Your n8n server is configured to use a secure cookie,
+      # however you are either visiting this via an insecure URL, or using Safari
+      - N8N_SECURE_COOKIE=false
 #      - N8N_LOG_LEVEL=debug
 #      - N8N_LOG_LEVEL=info
 #      - N8N_LOG_LEVEL=warn
 #      - N8N_LOG_LEVEL=error
 #      - N8N_LOG_LEVEL=silent
     hostname: n8n
-    ports:
-      - ${HTTP_PORT}:80
     links:
       - postgres
     volumes:
@@ -43,15 +45,22 @@ services:
         condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n.rule=Host(`n8n.deb24.localhost`)"
+      - "traefik.http.services.n8n.loadbalancer.server.port=80"
 
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
     restart: unless-stopped
-    ports:
-      - ${OLLAMA_PORT}:11434
     volumes:
       - ollama_storage:/root/.ollama
+    networks:
+      - backend
 
   init-ollama:
     image: ollama/ollama:latest
@@ -62,15 +71,21 @@ services:
     command:
       - "-c"
       - "sleep 3; export OLLAMA_HOST=ollama:11434; ollama pull mxbai-embed-large; ollama pull llama3.1:8b"
+    networks:
+      - backend
 
   qdrant:
     image: qdrant/qdrant
     hostname: qdrant
     restart: unless-stopped
-    ports:
-      - ${QDRANT_PORT}:6333
     volumes:
       - ${DATA_PATH}/qdrant:/qdrant/storage
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qdrant.rule=Host(`qdrant.deb24.localhost`)"
 
   playwright-chromium:
     image: playwright/chromium
@@ -78,6 +93,8 @@ services:
     restart: unless-stopped
     volumes:
       - ./src/playwright:/home/pwuser/src
+    networks:
+      - backend
 
   startup:
     build:
@@ -87,6 +104,8 @@ services:
     command: chown startup:startup /home/node/.n8n
     volumes:
       - ${DATA_PATH}/n8n:/home/node/.n8n
+    networks:
+      - backend
 
   postgres:
     build:
@@ -109,6 +128,8 @@ services:
       retries: 10
     ports:
       - ${PG_PORT}:5432
+    networks:
+      - backend
 
   redis:
     image: redis:alpine
@@ -116,6 +137,15 @@ services:
     restart: always
     volumes:
       - ${DATA_PATH}/redis:/data
+    networks:
+      - backend
 
 volumes:
   ollama_storage:
+
+networks:
+  frontend:
+    driver: bridge
+    external: true
+  backend:
+    driver: bridge

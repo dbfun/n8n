@@ -23,8 +23,6 @@ services:
       - N8N_HIDE_USAGE_PAGE=true
       - N8N_METRICS=true
     hostname: n8n
-    ports:
-      - ${HTTP_PORT}:80
     links:
       - postgres
     volumes:
@@ -37,6 +35,16 @@ services:
         condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n.rule=Host(`$APP_DOMAIN`)"
+      - "traefik.http.routers.n8n.entrypoints=https"
+      - "traefik.http.routers.n8n.tls=true"
+      - "traefik.http.routers.n8n.tls.certresolver=letsencrypt"
+      - "traefik.http.services.n8n.loadbalancer.server.port=80"
 
   ollama:
     image: ollama/ollama:latest
@@ -44,6 +52,8 @@ services:
     restart: unless-stopped
     volumes:
       - ollama_storage:/root/.ollama
+    networks:
+      - backend
 
   init-ollama:
     image: ollama/ollama:latest
@@ -54,15 +64,26 @@ services:
     command:
       - "-c"
       - "sleep 3; export OLLAMA_HOST=ollama:11434; ollama pull mxbai-embed-large; ollama pull llama3.1:8b"
+    networks:
+      - backend
 
   qdrant:
     image: qdrant/qdrant
     hostname: qdrant
     restart: unless-stopped
-    ports:
-      - ${QDRANT_PORT}:6333
     volumes:
       - ${DATA_PATH}/qdrant:/qdrant/storage
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qdrant.rule=Host(`$QDRANT_DOMAIN`)"
+      - "traefik.http.routers.qdrant.entrypoints=https"
+      - "traefik.http.routers.qdrant.tls=true"
+      - "traefik.http.routers.qdrant.tls.certresolver=letsencrypt"
+      # Auth
+      - "traefik.http.routers.qdrant.middlewares=basic-auth-global"
 
   startup:
     image: n8n_startup:${CI_COMMIT_SHA}
@@ -70,6 +91,8 @@ services:
     command: chown -R startup:startup /home/node/.n8n
     volumes:
       - ${DATA_PATH}/n8n:/home/node/.n8n
+    networks:
+      - backend
 
   postgres:
     image: n8n_postgres:${CI_COMMIT_SHA}
@@ -90,6 +113,8 @@ services:
       retries: 10
     ports:
       - ${PG_PORT}:5432
+    networks:
+      - backend
 
   redis:
     image: redis:alpine
@@ -100,3 +125,10 @@ services:
 
 volumes:
   ollama_storage:
+
+networks:
+  frontend:
+    driver: bridge
+    external: true
+  backend:
+    driver: bridge
