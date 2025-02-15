@@ -122,6 +122,8 @@ services:
     restart: always
     volumes:
       - ${DATA_PATH}/redis:/data
+    networks:
+      - backend
 
 volumes:
   ollama_storage:
