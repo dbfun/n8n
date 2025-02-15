@@ -30,4 +30,4 @@ export WEBHOOK_URL=<YOUR-NGROK-URL>
 
 ## Запуск на сервере
 
-Через GitLab: [.gitlab-ci.yml](.gitlab-ci.yml). Требуется Caddy как реверс-прокси.
+Через GitLab: [.gitlab-ci.yml](.gitlab-ci.yml). Требуется Traefik как реверс-прокси.
