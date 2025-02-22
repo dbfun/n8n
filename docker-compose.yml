@@ -38,7 +38,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${DATA_PATH}/n8n:/home/node/.n8n
       # для сохранения файлов в локальный каталог (для отладки)
-      - ./files:/home/node/files
+      - ./shared-files:/home/node/shared-files
     restart: always
     depends_on:
       postgres:
