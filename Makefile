@@ -30,16 +30,3 @@ list-workflow:
 .PHONY: export-workflow
 export-workflow:
 	@docker compose exec n8n n8n export:workflow --all
-
-#################################
-# playwright
-#################################
-
-# Playwright with Chromium
-.PHONY: playwright-chromium
-playwright-chromium:
-	@docker compose up -d playwright-chromium
-
-.PHONY: playwright-chromium-bash
-playwright-chromium-bash:
-	@docker compose exec playwright-chromium bash

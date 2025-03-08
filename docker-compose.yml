@@ -87,15 +87,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.qdrant.rule=Host(`qdrant.deb24.localhost`)"
 
-  playwright-chromium:
-    image: playwright/chromium
-    hostname: playwright-chromium
-    restart: unless-stopped
-    volumes:
-      - ./src/playwright:/home/pwuser/src
-    networks:
-      - backend
-
   startup:
     build:
       context: .

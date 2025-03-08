@@ -21,7 +21,7 @@ ngrok http 5678
 Затем прописать в `.env`:
 
 ```
-export WEBHOOK_URL=<YOUR-NGROK-URL>
+WEBHOOK_URL=<YOUR-NGROK-URL>
 ```
 
 Затем перезапускаем: `make up`.
