@@ -87,6 +87,17 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.qdrant.rule=Host(`qdrant.deb24.localhost`)"
 
+  neo4j:
+    image: neo4j:latest
+    hostname: neo4j
+    ports:
+      - '7474:7474' # HTTP-протокол
+#      - '7687:7687' # Bolt-протокол
+    environment:
+      - NEO4J_AUTH=none
+    volumes:
+      - ${DATA_PATH}/neo4j/data:/data
+
   # Авторизация: https://docs.stirlingpdf.com/Advanced%20Configuration/System%20and%20Security/
   # Языки для OCR https://docs.stirlingpdf.com/Advanced%20Configuration/OCR
   # Настройка https://hub.docker.com/r/stirlingtools/stirling-pdf
