@@ -87,6 +87,22 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.qdrant.rule=Host(`qdrant.deb24.localhost`)"
 
+  # Авторизация: https://docs.stirlingpdf.com/Advanced%20Configuration/System%20and%20Security/
+  # Языки для OCR https://docs.stirlingpdf.com/Advanced%20Configuration/OCR
+  # Настройка https://hub.docker.com/r/stirlingtools/stirling-pdf
+#  stirling-pdf:
+#    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+#    hostname: stirling-pdf
+#    volumes:
+#      - ./tessdata:/usr/share/tessdata
+#      - ./pipeline:/pipeline/
+#    networks:
+#      - frontend
+#      - backend
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.stirling-pdf.rule=Host(`stirling-pdf.deb24.localhost`)"
+
   startup:
     build:
       context: .
