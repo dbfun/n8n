@@ -15,6 +15,15 @@ down:
 	@docker compose down
 
 #################################
+# Update n8n
+#################################
+
+.PHONY: update
+update:
+	@docker pull docker.n8n.io/n8nio/n8n
+	@docker compose up -d ${SERVICES}
+
+#################################
 # n8n CLI
 #################################
 
