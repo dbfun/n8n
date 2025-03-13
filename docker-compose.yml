@@ -87,14 +87,17 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.qdrant.rule=Host(`qdrant.deb24.localhost`)"
 
+  # Local only
   neo4j:
     image: neo4j:latest
     hostname: neo4j
+    restart: unless-stopped
     ports:
       - '7474:7474' # HTTP-протокол
-#      - '7687:7687' # Bolt-протокол
+      - '7687:7687' # Bolt-протокол
     environment:
-      - NEO4J_AUTH=none
+      - NEO4J_AUTH
+#      - NEO4J_AUTH=none
     volumes:
       - ${DATA_PATH}/neo4j/data:/data
 
