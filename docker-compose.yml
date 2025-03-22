@@ -101,6 +101,20 @@ services:
     volumes:
       - ${DATA_PATH}/neo4j/data:/data
 
+  # Local only
+  # Требует установки community node: n8n-nodes-browserless
+  # https://github.com/browserless/browserless
+  browserless:
+    image: ghcr.io/browserless/chromium
+    hostname: browserless
+    restart: unless-stopped
+    environment:
+      - MAX_CONCURRENT_SESSIONS=10
+      - CONNECTION_TIMEOUT=120000
+      - TOKEN=${BROWSERLESS_TOKEN}
+    networks:
+      - backend
+
   # Авторизация: https://docs.stirlingpdf.com/Advanced%20Configuration/System%20and%20Security/
   # Языки для OCR https://docs.stirlingpdf.com/Advanced%20Configuration/OCR
   # Настройка https://hub.docker.com/r/stirlingtools/stirling-pdf
