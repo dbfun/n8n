@@ -115,6 +115,29 @@ services:
     networks:
       - backend
 
+  # Local only
+  # Настройки https://docs.nocodb.com/getting-started/self-hosted/environment-variables/
+  nocodb:
+    image: "nocodb/nocodb:latest"
+    environment:
+      - NC_DISABLE_TELE=true
+      - NC_DB
+#      - NC_ADMIN_EMAIL
+#      - NC_ADMIN_PASSWORD
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH}/nocodb:/usr/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nocodb.rule=Host(`nocodb.deb24.localhost`)"
+      - "traefik.http.services.nocodb.loadbalancer.server.port=8080"
+
   # Авторизация: https://docs.stirlingpdf.com/Advanced%20Configuration/System%20and%20Security/
   # Языки для OCR https://docs.stirlingpdf.com/Advanced%20Configuration/OCR
   # Настройка https://hub.docker.com/r/stirlingtools/stirling-pdf
