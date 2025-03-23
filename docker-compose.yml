@@ -74,6 +74,30 @@ services:
     networks:
       - backend
 
+  # Ключевые фичи: https://docs.openwebui.com/features/
+  # Настройки через env: https://docs.openwebui.com/getting-started/env-configuration
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - 3000:8080
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - VECTOR_DB=qdrant
+      - QDRANT_URI=http://qdrant:6333
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_OLLAMA_BASE_URL=http://ollama:11434
+#      - RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2 # default value
+      - PDF_EXTRACT_IMAGES=true # default value
+#      - RAG_FILE_MAX_SIZE=10000000
+#      - ENABLE_IMAGE_GENERATION=false # default value
+    networks:
+      - backend
+    volumes:
+#      - open-webui:/app/backend/data
+      - ${DATA_PATH}/open-webui:/app/backend/data
+
   qdrant:
     image: qdrant/qdrant
     hostname: qdrant

@@ -2,7 +2,7 @@
 # Application workflow
 #################################
 
-SERVICES=postgres n8n startup qdrant ollama init-ollama redis browserless nocodb
+SERVICES=postgres n8n startup qdrant ollama init-ollama redis browserless nocodb open-webui
 
 # Run all containers
 .PHONY: up
