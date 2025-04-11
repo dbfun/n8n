@@ -41,7 +41,7 @@ services:
       - ./shared-files:/home/node/shared-files
       # резервные копии
       - ./backups:/home/node/backups
-    restart: always
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -204,7 +204,7 @@ services:
       - POSTGRES_NON_ROOT_PASSWORD
     volumes:
       - ${DATA_PATH}/postgresql:/var/lib/postgresql/data
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
       interval: 5s
@@ -218,7 +218,7 @@ services:
   redis:
     image: redis:alpine
     hostname: redis
-    restart: always
+    restart: unless-stopped
     volumes:
       - ${DATA_PATH}/redis:/data
     networks:
