@@ -205,6 +205,7 @@ services:
     volumes:
       - ${DATA_PATH}/postgresql:/var/lib/postgresql/data
     restart: unless-stopped
+#    command: sleep infinity
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
       interval: 5s
