@@ -39,3 +39,18 @@ list-workflow:
 .PHONY: export-workflow
 export-workflow:
 	@docker compose exec n8n n8n export:workflow --all
+
+#################################
+# backup
+#################################
+
+.PHONY: backup
+backup:
+	@docker compose exec n8n n8n export:credentials --all --output=/home/node/backups/credentials.json
+	@docker compose exec n8n n8n export:workflow --all --output=/home/node/backups/workflows.json
+	@docker compose exec n8n cp /home/node/.n8n/config /home/node/backups
+
+.PHONY: restore
+restore:
+	@docker compose exec n8n n8n import:credentials --input=/home/node/backups/credentials.json
+	@docker compose exec n8n n8n import:workflow --input=/home/node/backups/workflows.json

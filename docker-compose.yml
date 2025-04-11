@@ -39,6 +39,8 @@ services:
       - ${DATA_PATH}/n8n:/home/node/.n8n
       # для сохранения файлов в локальный каталог (для отладки)
       - ./shared-files:/home/node/shared-files
+      # резервные копии
+      - ./backups:/home/node/backups
     restart: always
     depends_on:
       postgres:
