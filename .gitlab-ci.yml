@@ -32,6 +32,12 @@ build postgres:
   variables:
     APP_PART: postgres
 
+build n8n:
+  stage: build
+  extends: .base_build
+  variables:
+    APP_PART: n8n
+
 run services:
   stage: deploy
   tags:
