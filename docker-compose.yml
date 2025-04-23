@@ -170,7 +170,7 @@ services:
   # Языки для OCR https://docs.stirlingpdf.com/Advanced%20Configuration/OCR
   # Настройка https://hub.docker.com/r/stirlingtools/stirling-pdf
 #  stirling-pdf:
-#    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+#    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest-fat
 #    hostname: stirling-pdf
 #    volumes:
 #      - ./tessdata:/usr/share/tessdata
