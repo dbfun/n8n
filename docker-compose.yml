@@ -82,10 +82,8 @@ services:
   # Настройки через env: https://docs.openwebui.com/getting-started/env-configuration
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
+    hostname: open-webui
     restart: unless-stopped
-    ports:
-      - 3000:8080
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
       - VECTOR_DB=qdrant
@@ -93,14 +91,19 @@ services:
       - RAG_EMBEDDING_ENGINE=ollama
       - RAG_OLLAMA_BASE_URL=http://ollama:11434
 #      - RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2 # default value
-      - PDF_EXTRACT_IMAGES=true # default value
-#      - RAG_FILE_MAX_SIZE=10000000
+#      - PDF_EXTRACT_IMAGES=true # default value
+#      - RAG_FILE_MAX_SIZE=100
 #      - ENABLE_IMAGE_GENERATION=false # default value
+      - DOCLING_SERVER_URL=http://docling:5001
     networks:
+      - frontend
       - backend
     volumes:
-#      - open-webui:/app/backend/data
       - ${DATA_PATH}/open-webui:/app/backend/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.open-webui.rule=Host(`open-webui.deb24.localhost`)"
+      - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
 
   qdrant:
     image: qdrant/qdrant
@@ -181,6 +184,19 @@ services:
 #    labels:
 #      - "traefik.enable=true"
 #      - "traefik.http.routers.stirling-pdf.rule=Host(`stirling-pdf.deb24.localhost`)"
+
+  docling:
+    image: quay.io/docling-project/docling-serve
+    hostname: docling
+    restart: unless-stopped
+    environment:
+      - DOCLING_SERVE_ENABLE_UI=true
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.docling.rule=Host(`docling.deb24.localhost`)"
 
   startup:
     build:
