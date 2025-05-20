@@ -146,15 +146,15 @@ services:
     networks:
       - backend
 
-  # Local only
   # Настройки https://docs.nocodb.com/getting-started/self-hosted/environment-variables/
   nocodb:
-    image: "nocodb/nocodb:latest"
+    image: nocodb/nocodb:latest
     environment:
-      - NC_DISABLE_TELE=true
       - NC_DB
-#      - NC_ADMIN_EMAIL
-#      - NC_ADMIN_PASSWORD
+      - NC_ADMIN_EMAIL
+      - NC_ADMIN_PASSWORD
+      - NC_DISABLE_TELE=true
+      - NC_INVITE_ONLY_SIGNUP=true
     restart: unless-stopped
     volumes:
       - ${DATA_PATH}/nocodb:/usr/app/data

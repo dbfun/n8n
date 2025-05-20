@@ -85,6 +85,32 @@ services:
       # Auth
       - "traefik.http.routers.qdrant.middlewares=basic-auth-global"
 
+  # Настройки https://docs.nocodb.com/getting-started/self-hosted/environment-variables/
+  nocodb:
+    image: nocodb/nocodb:latest
+    environment:
+      - NC_DB
+      - NC_ADMIN_EMAIL
+      - NC_ADMIN_PASSWORD
+      - NC_DISABLE_TELE=true
+      - NC_INVITE_ONLY_SIGNUP=true
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH}/nocodb:/usr/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nocodb.rule=Host(`$NOCODB_DOMAIN`)"
+      - "traefik.http.routers.nocodb.entrypoints=https"
+      - "traefik.http.routers.nocodb.tls=true"
+      - "traefik.http.routers.nocodb.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nocodb.loadbalancer.server.port=8080"
+
   startup:
     image: n8n_startup:${CI_COMMIT_SHA}
     # смена владельца каталога, так как n8n запускается от непривилегированного пользователя
