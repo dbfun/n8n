@@ -4,12 +4,20 @@ variables:
   DEPLOY_FILE_ABS: ${DEPLOY_DIR}/docker-compose.yml
 
 stages:
+  - pull-n8n-image
   - build
   - deploy
 
 workflow:
   rules:
     - if: $CI_COMMIT_BRANCH == 'master'
+
+docker pull n8n:
+  stage: pull-n8n-image
+  script:
+    - docker pull docker.n8n.io/n8nio/n8n
+  tags:
+    - docker-image-builder
 
 .base_build:
   variables:
