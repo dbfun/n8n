@@ -155,6 +155,8 @@ services:
       - NC_ADMIN_PASSWORD
       - NC_DISABLE_TELE=true
       - NC_INVITE_ONLY_SIGNUP=true
+      # Против роста таблицы nc_audit_v2
+      - NC_DISABLE_AUDIT=true
     restart: unless-stopped
     volumes:
       - ${DATA_PATH}/nocodb:/usr/app/data
