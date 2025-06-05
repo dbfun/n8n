@@ -28,8 +28,10 @@ services:
     volumes:
       - ${DATA_PATH}/n8n:/home/node/.n8n
       # для сохранения файлов в локальный каталог (для отладки)
-      - ./files:/home/node/files
-    restart: always
+      - ./shared-files:/home/node/shared-files
+      # резервные копии
+      - ./backups:/home/node/backups
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -115,10 +117,15 @@ services:
 
   startup:
     image: n8n_startup:${CI_COMMIT_SHA}
-    # смена владельца каталога, так как n8n запускается от непривилегированного пользователя
-    command: chown -R startup:startup /home/node/.n8n
+    # смена владельца каталогов, так как n8n запускается от непривилегированного пользователя
+    command: >
+      sh -c "
+        chown startup:startup /home/node/.n8n /home/node/shared-files /home/node/backups
+      "
     volumes:
       - ${DATA_PATH}/n8n:/home/node/.n8n
+      - ./shared-files:/home/node/shared-files
+      - ./backups:/home/node/backups
     networks:
       - backend
 
@@ -133,7 +140,7 @@ services:
       - POSTGRES_NON_ROOT_PASSWORD
     volumes:
       - ${DATA_PATH}/postgresql:/var/lib/postgresql/data
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
       interval: 5s
@@ -147,7 +154,7 @@ services:
   redis:
     image: redis:alpine
     hostname: redis
-    restart: always
+    restart: unless-stopped
     volumes:
       - ${DATA_PATH}/redis:/data
     networks:

@@ -37,7 +37,6 @@ services:
     links:
       - postgres
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - ${DATA_PATH}/n8n:/home/node/.n8n
       # для сохранения файлов в локальный каталог (для отладки)
       - ./shared-files:/home/node/shared-files
@@ -171,6 +170,7 @@ services:
       - "traefik.http.routers.nocodb.rule=Host(`nocodb.deb24.localhost`)"
       - "traefik.http.services.nocodb.loadbalancer.server.port=8080"
 
+  # Local only
   # Авторизация: https://docs.stirlingpdf.com/Advanced%20Configuration/System%20and%20Security/
   # Языки для OCR https://docs.stirlingpdf.com/Advanced%20Configuration/OCR
   # Настройка https://hub.docker.com/r/stirlingtools/stirling-pdf
@@ -187,6 +187,7 @@ services:
 #      - "traefik.enable=true"
 #      - "traefik.http.routers.stirling-pdf.rule=Host(`stirling-pdf.deb24.localhost`)"
 
+  # Local only
   docling:
     image: quay.io/docling-project/docling-serve
     hostname: docling
@@ -204,10 +205,15 @@ services:
     build:
       context: .
       dockerfile: ./docker/startup/Dockerfile
-    # смена владельца каталога, так как n8n запускается от непривилегированного пользователя
-    command: chown startup:startup /home/node/.n8n
+    # смена владельца каталогов, так как n8n запускается от непривилегированного пользователя
+    command: >
+      sh -c "
+        chown startup:startup /home/node/.n8n /home/node/shared-files /home/node/backups
+      "
     volumes:
       - ${DATA_PATH}/n8n:/home/node/.n8n
+      - ./shared-files:/home/node/shared-files
+      - ./backups:/home/node/backups
     networks:
       - backend
 
