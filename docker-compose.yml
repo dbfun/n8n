@@ -24,6 +24,7 @@ services:
       - GENERIC_TIMEZONE=Europe/Moscow
       - N8N_HIDE_USAGE_PAGE=true
       - N8N_METRICS=true
+      - N8N_LISTEN_ADDRESS=0.0.0.0
       # Только для локальной разработки для обхода проблемы:
       # Your n8n server is configured to use a secure cookie,
       # however you are either visiting this via an insecure URL, or using Safari
