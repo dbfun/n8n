@@ -19,6 +19,16 @@ x-n8n: &service-n8n
     - frontend
     - backend
 
+x-nocodb: &service-nocodb
+  image: nocodb/nocodb:latest
+  restart: unless-stopped
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - frontend
+    - backend
+
 services:
 
   n8n:
@@ -129,7 +139,8 @@ services:
 
   # Настройки https://docs.nocodb.com/getting-started/self-hosted/environment-variables/
   nocodb:
-    image: nocodb/nocodb:latest
+    <<: *service-nocodb
+    hostname: nocodb
     environment:
       - NC_DB
       - NC_ADMIN_EMAIL
@@ -138,15 +149,8 @@ services:
       - NC_INVITE_ONLY_SIGNUP=true
       # Против роста таблицы nc_audit_v2
       - NC_DISABLE_AUDIT=true
-    restart: unless-stopped
     volumes:
       - ${DATA_PATH}/nocodb:/usr/app/data
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - frontend
-      - backend
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nocodb.rule=Host(`$NOCODB_DOMAIN`)"
@@ -154,6 +158,27 @@ services:
       - "traefik.http.routers.nocodb.tls=true"
       - "traefik.http.routers.nocodb.tls.certresolver=letsencrypt"
       - "traefik.http.services.nocodb.loadbalancer.server.port=8080"
+
+  test-nocodb:
+    <<: *service-nocodb
+    hostname: test-nocodb
+    environment:
+      - NC_DB=${TEST_NC_DB}
+      - NC_ADMIN_EMAIL=${TEST_NC_ADMIN_EMAIL}
+      - NC_ADMIN_PASSWORD=${TEST_NC_ADMIN_PASSWORD}
+      - NC_DISABLE_TELE=true
+      - NC_INVITE_ONLY_SIGNUP=true
+      # Против роста таблицы nc_audit_v2
+      - NC_DISABLE_AUDIT=true
+    volumes:
+      - ${DATA_PATH}/test-nocodb:/usr/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.test-nocodb.rule=Host(`$TEST_NOCODB_DOMAIN`)"
+      - "traefik.http.routers.test-nocodb.entrypoints=https"
+      - "traefik.http.routers.test-nocodb.tls=true"
+      - "traefik.http.routers.test-nocodb.tls.certresolver=letsencrypt"
+      - "traefik.http.services.test-nocodb.loadbalancer.server.port=8080"
 
   startup:
     image: n8n_startup:${CI_COMMIT_SHA}
